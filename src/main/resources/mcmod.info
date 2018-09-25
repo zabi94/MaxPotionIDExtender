@@ -1,0 +1,16 @@
+[
+{
+  "modid": "maxpotidext",
+  "name": "Max Potion ID Extender",
+  "description": "Lifts the potion id limit from 256 to 2B",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["ZaBi94"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
