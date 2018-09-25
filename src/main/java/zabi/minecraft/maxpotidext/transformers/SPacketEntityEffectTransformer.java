@@ -49,20 +49,28 @@ public class SPacketEntityEffectTransformer implements IClassTransformer {
 		
 		
 		
-		InsnList instructions = new InsnList();
 		Iterator<AbstractInsnNode> i = mn_init.instructions.iterator();
-		while (i.hasNext()) {
+		AbstractInsnNode targetNode = null;
+		int line = 0;
+		while (i.hasNext() && targetNode == null) {
 			AbstractInsnNode node = i.next();
 			if (node instanceof LineNumberNode) {
-				if (((LineNumberNode)node).line==1) {
-					instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-					instructions.add(new VarInsnNode(Opcodes.ALOAD, 2));
-					instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(CodeSnippets.class), "getIdFromPotEffect", "(L"+Type.getInternalName(PotionEffect.class)+";)I", false));
-					instructions.add(new FieldInsnNode(Opcodes.PUTFIELD, name.replace('.', '/'), "effectInt", "I"));
+				if (line == 1) {
+					targetNode = node;
 				}
+				line++;
 			}
-			instructions.add(node);
 		}
+		
+		if (targetNode == null) {
+			throw new ASMException("Can't find target node for SPacketEntityEffect constructor");
+		}
+		
+		//These are reversed, they get pushed down the stack
+		mn_init.instructions.insert(targetNode, new FieldInsnNode(Opcodes.PUTFIELD, name.replace('.', '/'), "effectInt", "I"));
+		mn_init.instructions.insert(targetNode, new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(CodeSnippets.class), "getIdFromPotEffect", "(L"+Type.getInternalName(PotionEffect.class)+";)I", false));
+		mn_init.instructions.insert(targetNode, new VarInsnNode(Opcodes.ALOAD, 2));
+		mn_init.instructions.insert(targetNode, new VarInsnNode(Opcodes.ALOAD, 0));
 		
 		Log.i("SPacketEntityEffect#<init> patched");
 

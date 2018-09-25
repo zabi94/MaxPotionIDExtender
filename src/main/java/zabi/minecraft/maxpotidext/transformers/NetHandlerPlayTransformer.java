@@ -9,14 +9,11 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.network.play.server.SPacketEntityEffect;
 import zabi.minecraft.maxpotidext.ASMException;
-import zabi.minecraft.maxpotidext.CodeSnippets;
 import zabi.minecraft.maxpotidext.Log;
 
 public class NetHandlerPlayTransformer implements IClassTransformer {
@@ -53,8 +50,8 @@ public class NetHandlerPlayTransformer implements IClassTransformer {
 		mn.instructions.remove(target.getPrevious());
 		mn.instructions.remove(target.getNext());
 		mn.instructions.insertBefore(target, new FieldInsnNode(Opcodes.GETFIELD, Type.getInternalName(SPacketEntityEffect.class), "effectInt", "I"));
-		mn.instructions.insertBefore(target, new InsnNode(Opcodes.DUP));
-		mn.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(CodeSnippets.class), "printIDReceived", "(I)V", false));
+//		mn.instructions.insertBefore(target, new InsnNode(Opcodes.DUP));
+//		mn.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(CodeSnippets.class), "printIDReceived", "(I)V", false));
 		mn.instructions.remove(target);
 		
 		Log.i("NetHandlerPlay patch complete");
