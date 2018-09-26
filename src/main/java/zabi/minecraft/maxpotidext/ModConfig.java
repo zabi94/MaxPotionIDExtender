@@ -9,5 +9,5 @@ public class ModConfig {
 	@Config.Comment("Set how many test potions should be generated")
 	@Config.RangeInt(min = 0, max = Integer.MAX_VALUE>>5)
 	@Config.Name("Test Potions")
-	public static int generateTestPotions = 2000;
+	public static int generateTestPotions = 0;
 }

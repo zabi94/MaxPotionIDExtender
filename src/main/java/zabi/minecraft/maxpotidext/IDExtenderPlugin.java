@@ -16,6 +16,7 @@ public class IDExtenderPlugin implements IFMLLoadingPlugin {
 
 	@Override
 	public String[] getASMTransformerClass() {
+		Obf.loadData();
 		return TRANSFORMERS;
 	}
 

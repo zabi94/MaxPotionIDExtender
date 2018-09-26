@@ -27,6 +27,13 @@ minecraft {
     coreMod = "zabi.minecraft.maxpotidext.IDExtenderPlugin"
 }
 
+jar {
+    manifest {
+        attributes("FMLCorePluginContainsFMLMod": "true", "FMLCorePlugin": "zabi.minecraft.maxpotidext.IDExtenderPlugin")
+    }
+
+}
+
 dependencies {
 }
 
