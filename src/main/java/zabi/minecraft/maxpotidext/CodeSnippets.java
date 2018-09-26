@@ -9,8 +9,4 @@ public class CodeSnippets {
 		return Potion.getIdFromPotion(pe.getPotion());
 	}
 	
-	public static void printIDReceived(int i) {
-		Log.i("Potion id received: "+i);
-	}
-	
 }

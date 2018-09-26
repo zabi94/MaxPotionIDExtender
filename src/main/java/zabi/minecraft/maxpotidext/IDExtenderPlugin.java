@@ -11,10 +11,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions
 public class IDExtenderPlugin implements IFMLLoadingPlugin {
 	
 	private static final String[] TRANSFORMERS = {
-			"zabi.minecraft.maxpotidext.transformers.SPacketEntityEffectTransformer",
-			"zabi.minecraft.maxpotidext.transformers.NetHandlerPlayTransformer",
-			"zabi.minecraft.maxpotidext.transformers.PotionEffectTransformer",
-			"zabi.minecraft.maxpotidext.transformers.GameDataTransformer"
+			"zabi.minecraft.maxpotidext.MPIDTransformer"
 	};
 
 	@Override
