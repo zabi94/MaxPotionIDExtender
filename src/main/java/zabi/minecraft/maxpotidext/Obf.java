@@ -12,7 +12,7 @@ public class Obf {
 		if (s.endsWith(";")) {
 			s = s.substring(1, s.length()-1);
 		}
-		return s.equals(Type.getInternalName(Potion.class)) || s.equals("ain");
+		return s.equals(Type.getInternalName(Potion.class)) || s.equals("uz");
 	}
 	
 	public static boolean isDeobf() {

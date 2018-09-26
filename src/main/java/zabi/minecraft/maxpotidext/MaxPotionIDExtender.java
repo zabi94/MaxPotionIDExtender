@@ -1,5 +1,6 @@
 package zabi.minecraft.maxpotidext;
 
+import java.lang.reflect.Field;
 import java.util.Random;
 
 import net.minecraft.potion.Potion;
@@ -16,6 +17,9 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.registries.ForgeRegistry;
 
 @Mod(modid=MaxPotionIDExtender.MOD_ID, name=MaxPotionIDExtender.NAME, version=MaxPotionIDExtender.VERSION)
 public class MaxPotionIDExtender {
@@ -27,8 +31,20 @@ public class MaxPotionIDExtender {
 	@Instance
 	public static MaxPotionIDExtender INSTANCE;
 	
+	private static Field fieldMax = ReflectionHelper.findField(ForgeRegistry.class, "max");
+	
 	@EventHandler
 	public void init(FMLPreInitializationEvent evt) {
+		try {
+			int maxPotions = fieldMax.getInt(ForgeRegistries.POTIONS);
+			if (maxPotions<256) {
+				throw new ASMException("Limit is unchanged, id extension failed. Limit is: "+maxPotions);
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
@@ -45,7 +61,6 @@ public class MaxPotionIDExtender {
 			Log.i("Generating test potions");
 		}
 		for (int i=0;i<ModConfig.generateTestPotions;i++) {
-			Log.i("Adding potion #"+i);
 			Potion p = new PotionTest(i);
 			p.setRegistryName(new ResourceLocation(MOD_ID, "TestPotion"+i));
 			evt.getRegistry().register(p);

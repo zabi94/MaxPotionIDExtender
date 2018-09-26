@@ -26,7 +26,7 @@ public class ASMException extends RuntimeException {
 		this(message+"\n"+getStringDescriptor(node));
 	}
 
-	private static String getStringDescriptor(MethodNode node) {
+	public static String getStringDescriptor(MethodNode node) {
 		StringBuilder sb = new StringBuilder();
 		Iterator<AbstractInsnNode> i = node.instructions.iterator();
 		while (i.hasNext()) {

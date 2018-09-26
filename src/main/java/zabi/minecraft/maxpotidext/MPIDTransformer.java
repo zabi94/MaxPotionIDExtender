@@ -121,7 +121,12 @@ public class MPIDTransformer implements IClassTransformer {
 		mn_init.instructions.insert(targetNode, new VarInsnNode(Opcodes.ALOAD, 2));
 		mn_init.instructions.insert(targetNode, new VarInsnNode(Opcodes.ALOAD, 0));
 		
-
+		MethodNode mn_empty_init = locateMethod(cn, "()V", "<init>", "<init>");
+		
+		AbstractInsnNode tgt = locateTargetInsn(mn_empty_init, n -> n.getOpcode()==Opcodes.RETURN);
+		mn_empty_init.instructions.insertBefore(tgt, new VarInsnNode(Opcodes.ALOAD, 0));
+		mn_empty_init.instructions.insertBefore(tgt, new LdcInsnNode(0));
+		mn_empty_init.instructions.insertBefore(tgt, new FieldInsnNode(Opcodes.PUTFIELD, Obf.SPacketEntityEffect, "effectInt", "I"));
 
 		//Patch readPacketData
 		MethodNode mn_readPacket = locateMethod(cn, "(L"+Obf.PacketBuffer+";)V", "readPacketData", "a");
