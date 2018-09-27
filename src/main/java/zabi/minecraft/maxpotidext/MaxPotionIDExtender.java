@@ -3,7 +3,6 @@ package zabi.minecraft.maxpotidext;
 import java.lang.reflect.Field;
 import java.util.Random;
 
-import net.minecraft.network.play.server.SPacketEntityEffect;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionType;
@@ -42,14 +41,6 @@ public class MaxPotionIDExtender {
 				throw new ASMException("Limit is unchanged, id extension failed. Limit is: "+maxPotions);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		
-		//Load class early
-		
-		try {
-			SPacketEntityEffect.class.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
 		
