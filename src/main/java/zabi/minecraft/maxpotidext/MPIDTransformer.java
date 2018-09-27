@@ -22,8 +22,6 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 public class MPIDTransformer implements IClassTransformer {
 	
-	public static int classesTransformed = 0;
-
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (transformedName.equals("net.minecraft.client.network.NetHandlerPlayClient")) {
@@ -40,6 +38,22 @@ public class MPIDTransformer implements IClassTransformer {
 		}
 		if (transformedName.equals("net.minecraft.network.play.server.SPacketRemoveEntityEffect")) {
 			return transformSPacketRemoveEntityEffect(basicClass);
+		}
+		if (transformedName.equals("net.minecraft.nbt.NBTTagCompound")) {
+			ClassReader cr = new ClassReader(basicClass);
+			ClassNode cn = new ClassNode();
+			cr.accept(cn, 0);
+			if (!cn.name.equals(Obf.NBTTagCompound)) {
+				throw new ASMException("The class NBTTagCompound has broken mappings, should be "+cn.name);
+			}
+		}
+		if (transformedName.equals("net.minecraft.network.PacketBuffer")) {
+			ClassReader cr = new ClassReader(basicClass);
+			ClassNode cn = new ClassNode();
+			cr.accept(cn, 0);
+			if (!cn.name.equals(Obf.PacketBuffer)) {
+				throw new ASMException("The class PacketBuffer has broken mappings, should be "+cn.name);
+			}
 		}
 		return basicClass;
 	}
@@ -83,7 +97,7 @@ public class MPIDTransformer implements IClassTransformer {
 		
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
-		classesTransformed++;
+		Log.i("Patch Successful");
 		return cw.toByteArray();
 	}
 	
@@ -92,6 +106,10 @@ public class MPIDTransformer implements IClassTransformer {
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
+		
+		if (!Obf.SPacketEntityEffect.equals(cn.name)) {
+			throw new ASMException("Mapping mismatch! SPacketEntityEffect is "+cn.name+", not "+Obf.SPacketEntityEffect);
+		}
 
 		//Adding a new field, int effectInt
 		cn.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, "effectInt", "I", null, 0));
@@ -132,27 +150,26 @@ public class MPIDTransformer implements IClassTransformer {
 		MethodNode mn_readPacket = locateMethod(cn, "(L"+Obf.PacketBuffer+";)V", "readPacketData", "a");
 		String readVarInt_name = (Obf.isDeobf()?"readVarInt":"g");
 		
-		AbstractInsnNode target = mn_readPacket.instructions.get(1);
+		AbstractInsnNode target = locateTargetInsn(mn_readPacket, n -> n.getOpcode()==Opcodes.RETURN).getPrevious().getPrevious();
+		mn_readPacket.instructions.insertBefore(target, new VarInsnNode(Opcodes.ALOAD, 0));
+		mn_readPacket.instructions.insertBefore(target, new VarInsnNode(Opcodes.ALOAD, 1));
+		mn_readPacket.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.PacketBuffer, readVarInt_name, "()I", false));
+		mn_readPacket.instructions.insertBefore(target, new FieldInsnNode(Opcodes.PUTFIELD, Obf.SPacketEntityEffect, "entityInt", "I"));
 		
-		mn_readPacket.instructions.insert(target, new FieldInsnNode(Opcodes.PUTFIELD, Obf.SPacketEntityEffect, "entityInt", "I"));
-		mn_readPacket.instructions.insert(target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.PacketBuffer, readVarInt_name, "()I", false));
-		mn_readPacket.instructions.insert(target, new VarInsnNode(Opcodes.ALOAD, 1));
-		mn_readPacket.instructions.insert(target, new VarInsnNode(Opcodes.ALOAD, 0));
-		
-
 		//Patch writePacketData
 		MethodNode mn_writePacket = locateMethod(cn, "(L"+Obf.PacketBuffer+";)V", "writePacketData", "b");
 		String writeVarInt_name = (Obf.isDeobf()?"writeVarInt":"d");
-		AbstractInsnNode wp_target = mn_writePacket.instructions.get(1);
-		mn_writePacket.instructions.insert(wp_target, new InsnNode(Opcodes.POP));
-		mn_writePacket.instructions.insert(wp_target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.PacketBuffer, writeVarInt_name, "(I)L"+Obf.PacketBuffer+";", false));
-		mn_writePacket.instructions.insert(wp_target, new FieldInsnNode(Opcodes.GETFIELD, Obf.SPacketEntityEffect, "effectInt", "I"));
-		mn_writePacket.instructions.insert(wp_target, new VarInsnNode(Opcodes.ALOAD, 0));
-		mn_writePacket.instructions.insert(wp_target, new VarInsnNode(Opcodes.ALOAD, 1));
+		AbstractInsnNode wp_target = locateTargetInsn(mn_writePacket, n -> n.getOpcode()==Opcodes.RETURN).getPrevious().getPrevious();
+		
+		mn_writePacket.instructions.insertBefore(wp_target, new VarInsnNode(Opcodes.ALOAD, 1));
+		mn_writePacket.instructions.insertBefore(wp_target, new VarInsnNode(Opcodes.ALOAD, 0));
+		mn_writePacket.instructions.insertBefore(wp_target, new FieldInsnNode(Opcodes.GETFIELD, Obf.SPacketEntityEffect, "effectInt", "I"));
+		mn_writePacket.instructions.insertBefore(wp_target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.PacketBuffer, writeVarInt_name, "(I)L"+Obf.PacketBuffer+";", false));
+		mn_writePacket.instructions.insertBefore(wp_target, new InsnNode(Opcodes.POP));
 		
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
-		classesTransformed++;
+		Log.i("Patch Successful");
 		return cw.toByteArray();
 	}
 	
@@ -176,7 +193,7 @@ public class MPIDTransformer implements IClassTransformer {
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
-		classesTransformed++;
+		Log.i("Patch Successful");
 		return cw.toByteArray();
 	}
 	
@@ -185,6 +202,10 @@ public class MPIDTransformer implements IClassTransformer {
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
+		
+		if (!cn.name.equals(Obf.PotionEffect)) {
+			throw new ASMException("Mapping mismatch! PotionEffect is "+cn.name+", not "+Obf.PotionEffect);
+		}
 		
 		MethodNode mn = locateMethod(cn, "(L"+Obf.NBTTagCompound+";)L"+Obf.NBTTagCompound+";", "writeCustomPotionEffectToNBT", "a");
 		AbstractInsnNode ant = locateTargetInsn(mn, n -> n.getOpcode() == Opcodes.I2B);
@@ -207,7 +228,7 @@ public class MPIDTransformer implements IClassTransformer {
 		
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
-		classesTransformed++;
+		Log.i("Patch Successful");
 		return cw.toByteArray();
 	}
 
@@ -216,6 +237,7 @@ public class MPIDTransformer implements IClassTransformer {
 		ClassReader cr = new ClassReader(basicClass);
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
+		
 		MethodNode mn = locateMethod(cn, "(L"+Obf.SPacketEntityEffect+";)V", "handleEntityEffect", "a");
 		AbstractInsnNode target = locateTargetInsn(mn, n -> n.getOpcode()==Opcodes.SIPUSH);
 		mn.instructions.remove(target.getPrevious());
@@ -224,7 +246,7 @@ public class MPIDTransformer implements IClassTransformer {
 		mn.instructions.remove(target);
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
-		classesTransformed++;
+		Log.i("Patch Successful");
 		return cw.toByteArray();
 	}
 	

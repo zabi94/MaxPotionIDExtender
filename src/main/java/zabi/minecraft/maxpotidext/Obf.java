@@ -28,7 +28,7 @@ public class Obf {
 		} else {
 			NBTTagCompound = "fy";     
 			PotionEffect = "va";       
-			SPacketEntityEffect = "kv";
+			SPacketEntityEffect = "kw";
 			PacketBuffer = "gy";       
 		}
 	}
