@@ -39,6 +39,9 @@ public class MPIDTransformer implements IClassTransformer {
 		if (transformedName.equals("net.minecraft.network.play.server.SPacketRemoveEntityEffect")) {
 			return transformSPacketRemoveEntityEffect(basicClass);
 		}
+		if (transformedName.equals("net.minecraft.item.ItemStack")) {
+			return transformItemStack(basicClass);
+		}
 		if (transformedName.equals("net.minecraft.nbt.NBTTagCompound")) {
 			ClassReader cr = new ClassReader(basicClass);
 			ClassNode cn = new ClassNode();
@@ -77,6 +80,24 @@ public class MPIDTransformer implements IClassTransformer {
 			throw new ASMException("Can't locate target instruction in "+mn.name, mn);
 		}
 		return target;
+	}
+	
+	private byte[] transformItemStack(byte[] basicClass) {
+		ClassReader cr = new ClassReader(basicClass);
+		ClassNode cn = new ClassNode();
+		cr.accept(cn, 0);
+		
+		String descr = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/client/util/ITooltipFlag;)Ljava/util/List;";
+		String getIntegerName = Obf.isDeobf()?"getInteger":"func_74762_e";
+		
+		MethodNode mn = locateMethod(cn, descr, "func_82840_a", "getTooltip");
+		AbstractInsnNode target = locateTargetInsn(mn, n -> n.getOpcode()==Opcodes.INVOKEVIRTUAL && n.getPrevious().getOpcode()==Opcodes.LDC && ((LdcInsnNode)n.getPrevious()).cst.toString().equals("id"));
+		mn.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.NBTTagCompound, getIntegerName, "(Ljava/lang/String;)I", false));
+		mn.instructions.remove(target);
+		
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+		cn.accept(cw);
+		return cw.toByteArray();
 	}
 	
 	private byte[] transformSPacketRemoveEntityEffect(byte[] basicClass) {
