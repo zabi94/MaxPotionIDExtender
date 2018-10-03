@@ -24,12 +24,18 @@ public class Obf {
 			NBTTagCompound = "net/minecraft/nbt/NBTTagCompound";     
 			PotionEffect ="net/minecraft/potion/PotionEffect";
 			SPacketEntityEffect = "net/minecraft/network/play/server/SPacketEntityEffect";
-			PacketBuffer = "net/minecraft/network/PacketBuffer";   
+			PacketBuffer = "net/minecraft/network/PacketBuffer";
+			ItemStack = "net/minecraft/item/ItemStack";
+			World = "net/minecraft/world/World";
+			ITooltipFlag = "net/minecraft/client/util/ITooltipFlag";
 		} else {
 			NBTTagCompound = "fy";     
 			PotionEffect = "va";       
 			SPacketEntityEffect = "kw";
-			PacketBuffer = "gy";       
+			PacketBuffer = "gy";     
+			ItemStack = "ain";
+			World = "ams";
+			ITooltipFlag = "ajz";
 		}
 	}
 	
@@ -37,4 +43,7 @@ public class Obf {
 	public static String PotionEffect;
 	public static String SPacketEntityEffect;
 	public static String PacketBuffer;
+	public static String ItemStack;
+	public static String World;
+	public static String ITooltipFlag;
 }

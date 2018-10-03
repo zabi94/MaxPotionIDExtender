@@ -42,6 +42,9 @@ public class MPIDTransformer implements IClassTransformer {
 		if (transformedName.equals("net.minecraft.item.ItemStack")) {
 			return transformItemStack(basicClass);
 		}
+		if (transformedName.equals("net.minecraft.item.ItemEnchantedBook")) {
+			return transformEnchantedBook(basicClass);
+		}
 		if (transformedName.equals("net.minecraft.nbt.NBTTagCompound")) {
 			ClassReader cr = new ClassReader(basicClass);
 			ClassNode cn = new ClassNode();
@@ -61,6 +64,25 @@ public class MPIDTransformer implements IClassTransformer {
 		return basicClass;
 	}
 	
+	private byte[] transformEnchantedBook(byte[] basicClass) {
+		ClassReader cr = new ClassReader(basicClass);
+		ClassNode cn = new ClassNode();
+		cr.accept(cn, 0);
+		
+		String descr = "(L"+Obf.ItemStack+";L"+Obf.World+";Ljava/util/List;L"+Obf.ITooltipFlag+";)V";
+		MethodNode mn = locateMethod(cn, descr, "func_77624_a", "addInformation");
+		
+		String getIntegerName = Obf.isDeobf()?"getInteger":"func_74762_e";
+		AbstractInsnNode target = locateTargetInsn(mn, n -> n.getOpcode()==Opcodes.INVOKEVIRTUAL && n.getPrevious().getOpcode()==Opcodes.LDC && ((LdcInsnNode)n.getPrevious()).cst.toString().equals("id"));
+		
+		mn.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.NBTTagCompound, getIntegerName, "(Ljava/lang/String;)I", false));
+		mn.instructions.remove(target);
+		
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+		cn.accept(cw);
+		return cw.toByteArray();
+	}
+
 	private static MethodNode locateMethod(ClassNode cn, String desc, String nameIn, String deobfNameIn) {
 		return cn.methods.parallelStream()
 				.filter(n -> n.desc.equals(desc) && (n.name.equals(nameIn) || n.name.equals(deobfNameIn)))
