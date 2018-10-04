@@ -117,6 +117,16 @@ public class MPIDTransformer implements IClassTransformer {
 		mn.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.NBTTagCompound, getIntegerName, "(Ljava/lang/String;)I", false));
 		mn.instructions.remove(target);
 		
+		String descAddEnch = "(L"+Obf.Enchantment+";I)V";
+		MethodNode mn2 = locateMethod(cn, descAddEnch, "addEnchantment", "func_77966_a");
+		
+		String setIntegerName = Obf.isDeobf() ? "setInteger" : "func_74768_a";
+		
+		mn2.instructions.remove(locateTargetInsn(mn2, n -> n.getOpcode()==Opcodes.I2S));
+		AbstractInsnNode target2 = locateTargetInsn(mn2, n -> n.getOpcode()==Opcodes.INVOKEVIRTUAL && n.getPrevious().getPrevious().getPrevious().getOpcode()==Opcodes.LDC && ((LdcInsnNode)n.getPrevious().getPrevious().getPrevious()).cst.toString().equals("id"));
+		mn.instructions.insertBefore(target2, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.NBTTagCompound, setIntegerName, "(Ljava/lang/String;I)V", false));
+		mn.instructions.remove(target2);
+		
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		cn.accept(cw);
 		return cw.toByteArray();

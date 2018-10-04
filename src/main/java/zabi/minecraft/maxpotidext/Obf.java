@@ -28,6 +28,7 @@ public class Obf {
 			ItemStack = "net/minecraft/item/ItemStack";
 			World = "net/minecraft/world/World";
 			ITooltipFlag = "net/minecraft/client/util/ITooltipFlag";
+			Enchantment = "net/minecraft/enchantment/Enchantment";
 			EntityPlayer = "net/minecraft/entity/player/EntityPlayer";
 		} else {
 			NBTTagCompound = "fy";     
@@ -37,6 +38,7 @@ public class Obf {
 			ItemStack = "ain";
 			World = "ams";
 			ITooltipFlag = "ajz";
+			Enchantment = "ali";
 			EntityPlayer = "aeb";
 		}
 	}
@@ -48,5 +50,6 @@ public class Obf {
 	public static String ItemStack;
 	public static String World;
 	public static String ITooltipFlag;
+	public static String Enchantment;
 	public static String EntityPlayer;
 }
