@@ -109,7 +109,7 @@ public class MPIDTransformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		
-		String descr = "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/client/util/ITooltipFlag;)Ljava/util/List;";
+		String descr = "(L"+Obf.EntityPlayer+";L"+Obf.ITooltipFlag+";)Ljava/util/List;";
 		String getIntegerName = Obf.isDeobf()?"getInteger":"func_74762_e";
 		
 		MethodNode mn = locateMethod(cn, descr, "func_82840_a", "getTooltip");
