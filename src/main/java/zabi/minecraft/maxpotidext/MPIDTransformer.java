@@ -140,7 +140,7 @@ public class MPIDTransformer implements IClassTransformer {
 		mn.instructions.remove(target);
 		
 		String descAddEnch = "(L"+Obf.Enchantment+";I)V";
-		MethodNode mn2 = locateMethod(cn, descAddEnch, "addEnchantment", "func_77966_a");
+		MethodNode mn2 = locateMethod(cn, descAddEnch, "addEnchantment", "func_77966_a", "a");
 		
 		String setIntegerName = Obf.isDeobf() ? "setInteger" : "func_74768_a";
 		

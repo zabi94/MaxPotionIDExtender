@@ -38,7 +38,7 @@ public class Obf {
 			ItemStack = "aip";
 			World = "ams";
 			ITooltipFlag = "akb";
-			Enchantment = "ali";
+			Enchantment = "alk";
 			EntityPlayer = "aed";
 		}
 	}
