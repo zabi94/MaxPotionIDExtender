@@ -37,9 +37,9 @@ public class Obf {
 			PacketBuffer = "gy";     
 			ItemStack = "ain";
 			World = "ams";
-			ITooltipFlag = "ajz";
+			ITooltipFlag = "akb";
 			Enchantment = "ali";
-			EntityPlayer = "aeb";
+			EntityPlayer = "aed";
 		}
 	}
 	
