@@ -35,7 +35,7 @@ public class Obf {
 			PotionEffect = "va";       
 			SPacketEntityEffect = "kw";
 			PacketBuffer = "gy";     
-			ItemStack = "ain";
+			ItemStack = "aip";
 			World = "ams";
 			ITooltipFlag = "akb";
 			Enchantment = "ali";
