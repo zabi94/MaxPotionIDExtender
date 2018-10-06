@@ -83,10 +83,28 @@ public class MPIDTransformer implements IClassTransformer {
 		return cw.toByteArray();
 	}
 
-	private static MethodNode locateMethod(ClassNode cn, String desc, String nameIn, String deobfNameIn) {
+	private static MethodNode locateMethod(ClassNode cn, String desc, String... namesIn) {
 		return cn.methods.parallelStream()
-				.filter(n -> n.desc.equals(desc) && (n.name.equals(nameIn) || n.name.equals(deobfNameIn)))
-				.findAny().orElseThrow(() -> new ASMException(nameIn +" ("+deobfNameIn+"): "+desc+" cannot be found in "+cn.name, cn));
+				.filter(n -> n.desc.equals(desc) && anyMatch(namesIn, n.name))
+				.findAny().orElseThrow(() -> new ASMException(getNames(namesIn) +": "+desc+" cannot be found in "+cn.name, cn));
+	}
+	
+	private static boolean anyMatch(String[] pool, String match) {
+		for (String s:pool) {
+			if (s.equals(match)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static String getNames(String[] pool) {
+		StringBuilder sb = new StringBuilder();
+		for (String s:pool) {
+			sb.append(s);
+			sb.append(" ");
+		}
+		return sb.toString().trim();
 	}
 	
 	private static AbstractInsnNode locateTargetInsn(MethodNode mn, Predicate<AbstractInsnNode> filter) {
@@ -109,10 +127,14 @@ public class MPIDTransformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 		
+		if (!cn.name.equals(Obf.ItemStack)) {
+			throw new ASMException("The class ItemStack has broken mappings, should be "+cn.name);
+		}
+		
 		String descr = "(L"+Obf.EntityPlayer+";L"+Obf.ITooltipFlag+";)Ljava/util/List;";
 		String getIntegerName = Obf.isDeobf()?"getInteger":"func_74762_e";
 		
-		MethodNode mn = locateMethod(cn, descr, "func_82840_a", "getTooltip");
+		MethodNode mn = locateMethod(cn, descr, "func_82840_a", "getTooltip", "a");
 		AbstractInsnNode target = locateTargetInsn(mn, n -> n.getOpcode()==Opcodes.INVOKEVIRTUAL && n.getPrevious().getOpcode()==Opcodes.LDC && ((LdcInsnNode)n.getPrevious()).cst.toString().equals("id"));
 		mn.instructions.insertBefore(target, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, Obf.NBTTagCompound, getIntegerName, "(Ljava/lang/String;)I", false));
 		mn.instructions.remove(target);
