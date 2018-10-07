@@ -9,12 +9,17 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 @IFMLLoadingPlugin.TransformerExclusions({"zabi.minecraft.maxpotidext"})
 public class IDExtenderPlugin implements IFMLLoadingPlugin {
 	
+	private boolean jeid = false;
+	
 	private static final String[] TRANSFORMERS = {
 			"zabi.minecraft.maxpotidext.MPIDTransformer"
 	};
 
 	@Override
 	public String[] getASMTransformerClass() {
+		if (jeid) {
+			return new String[0];
+		}
 		Obf.loadData();
 		return TRANSFORMERS;
 	}
@@ -31,6 +36,13 @@ public class IDExtenderPlugin implements IFMLLoadingPlugin {
 
 	@Override
 	public void injectData(Map<String, Object> data) {
+		try {
+			Class.forName("org.dimdev.jeid.JEIDLoadingPlugin", false, null);
+			Log.i("JEID detected - MaxPotionIDExtender will deactivate itself");
+			jeid = true;
+		} catch (ClassNotFoundException e) {
+			Log.i("No JEID detected");
+		}
 	}
 
 	@Override
