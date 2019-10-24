@@ -59,7 +59,7 @@ public class MPIDTransformer implements IClassTransformer {
 	}
 	
 	private static MethodNode locateMethod(ClassNode cn, String desc, String nameIn, String deobfNameIn) {
-		return cn.methods.parallelStream()
+		return cn.methods.stream()
 				.filter(n -> n.desc.equals(desc) && (n.name.equals(nameIn) || n.name.equals(deobfNameIn)))
 				.findAny().orElseThrow(() -> new ASMException(nameIn +" ("+deobfNameIn+"): "+desc+" cannot be found in "+cn.name, cn));
 	}
@@ -179,7 +179,7 @@ public class MPIDTransformer implements IClassTransformer {
 		ClassNode cn = new ClassNode();
 		cr.accept(cn, 0);
 
-		FieldNode mpid = cn.fields.parallelStream()
+		FieldNode mpid = cn.fields.stream()
 				.filter(fn -> fn.name.equals("MAX_POTION_ID"))
 				.findAny().orElseThrow(() -> new ASMException("Error finding MAX_POTION_ID constant in GameData.class"));
 
