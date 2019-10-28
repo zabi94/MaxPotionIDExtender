@@ -15,18 +15,21 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.registries.ForgeRegistry;
 
-@Mod(modid=MaxPotionIDExtender.MOD_ID, name=MaxPotionIDExtender.NAME, version=MaxPotionIDExtender.VERSION)
+@Mod(modid=MaxPotionIDExtender.MOD_ID, name=MaxPotionIDExtender.NAME, version=MaxPotionIDExtender.VERSION, certificateFingerprint = MaxPotionIDExtender.FINGERPRINT)
 public class MaxPotionIDExtender {
+	
 	public static final String MOD_ID = "maxpotidext";
 	public static final String NAME = "MaxPotionIDExtender";
-	public static final String VERSION = "0.0.2.1";
+	public static final String VERSION = "@VERSION@";
 	public static final String MC_VERSION = "[1.12.2,1.12.2]";
+	public static final String FINGERPRINT = "@FINGERPRINT@";
 	
 	@Instance
 	public static MaxPotionIDExtender INSTANCE;
@@ -45,6 +48,11 @@ public class MaxPotionIDExtender {
 		}
 		
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	@EventHandler
+	public void certInvalid(FMLFingerprintViolationEvent evt) {
+		Log.w("\n\n!!! WARNING:\nThe signature for the mod MaxPotionIDExtender is invalid.\nPlease make sure to download only from the official source to avoid malware, go to https://minecraft.curseforge.com/projects/max-potion-id-extender\n\n");
 	}
 	
 	@SubscribeEvent
